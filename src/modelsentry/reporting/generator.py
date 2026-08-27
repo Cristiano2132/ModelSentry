@@ -7,6 +7,7 @@ from modelsentry.core.base import ValidationResult
 from modelsentry.viz.plots import plot_kri_summary, plot_risk_matrix, plot_psi_mensal
 from modelsentry.core.metadata import load_kpi_metadata
 from datetime import datetime
+from modelsentry.viz import theme
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -22,8 +23,8 @@ HTML_TEMPLATE = """
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 40px;
-            background-color: #f4f7f6;
-            color: #333;
+            background-color: {HTML_BG_COLOR};
+            color: {HTML_TEXT_COLOR};
         }}
         .container {{
             max-width: 1000px;
@@ -36,26 +37,26 @@ HTML_TEMPLATE = """
         .page {{
             margin-bottom: 60px;
             padding-bottom: 40px;
-            border-bottom: 3px solid #ecf0f1;
+            border-bottom: 3px solid {HTML_TABLE_BORDER};
         }}
         h1 {{
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
+            color: {HTML_TEXT_COLOR};
+            border-bottom: 2px solid {HTML_HEADER_COLOR};
             padding-bottom: 10px;
         }}
         h2 {{
-            color: #34495e;
+            color: {HTML_TEXT_COLOR};
             margin-top: 30px;
-            background-color: #ecf0f1;
+            background-color: {HTML_TABLE_BORDER};
             padding: 10px;
             border-radius: 4px;
         }}
         h3 {{
-            color: #2980b9;
+            color: {HTML_HEADER_COLOR};
         }}
         .metadata-card {{
-            background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
+            background-color: {HTML_CARD_BG};
+            border: 1px solid {HTML_TABLE_BORDER};
             padding: 15px;
             border-radius: 6px;
             margin-bottom: 20px;
@@ -71,7 +72,8 @@ HTML_TEMPLATE = """
         .score-card {{
             flex: 1;
             text-align: center;
-            background-color: #ecf0f1;
+            background-color: {HTML_CARD_BG};
+            border: 1px solid {HTML_TABLE_BORDER};
             padding: 20px;
             border-radius: 8px;
         }}
@@ -88,14 +90,14 @@ HTML_TEMPLATE = """
         th, td {{
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid {HTML_TABLE_BORDER};
         }}
         th {{
-            background-color: #3498db;
-            color: white;
+            background-color: {HTML_TABLE_HEAD_BG};
+            color: {HTML_TABLE_HEAD_TEXT};
         }}
         tr:hover {{
-            background-color: #f1f1f1;
+            background-color: {HTML_BG_COLOR};
         }}
         .chart-container {{
             text-align: center;
@@ -110,17 +112,20 @@ HTML_TEMPLATE = """
         .mermaid-container {{
             margin: 20px 0;
             padding: 15px;
-            background: #fff;
-            border: 1px solid #ddd;
+            background: {HTML_CARD_BG};
+            border: 1px solid {HTML_TABLE_BORDER};
             border-radius: 4px;
             text-align: center;
         }}
         .storytelling {{
-            background-color: #e8f4f8;
+            background-color: {HTML_CARD_BG};
             padding: 15px;
-            border-left: 5px solid #3498db;
+            border-left: 5px solid {HTML_HEADER_COLOR};
             margin: 20px 0;
             font-style: italic;
+            border-top: 1px solid {HTML_TABLE_BORDER};
+            border-right: 1px solid {HTML_TABLE_BORDER};
+            border-bottom: 1px solid {HTML_TABLE_BORDER};
         }}
     </style>
 </head>
@@ -261,11 +266,11 @@ def _fig_to_b64(fig) -> str:
     return base64.b64encode(buf.read()).decode('utf-8')
 
 def _get_color(score: float) -> str:
-    if score <= 20: return '#27ae60'
-    elif score <= 40: return '#2ecc71'
-    elif score <= 60: return '#f1c40f'
-    elif score <= 80: return '#e67e22'
-    return '#c0392b'
+    if score <= 20: return theme.RISK_COLORS['level_1']
+    elif score <= 40: return theme.RISK_COLORS['level_2']
+    elif score <= 60: return theme.RISK_COLORS['level_3']
+    elif score <= 80: return theme.RISK_COLORS['level_4']
+    return theme.RISK_COLORS['level_5']
 
 def _generate_mermaid_graph(suite: Any, results: List[ValidationResult]) -> str:
     lines = ["graph TD"]
@@ -417,7 +422,14 @@ def generate_html_report(suite: Any, results: List[ValidationResult], global_ris
         quanti_summary_chart=quanti_summary_chart,
         quanti_table_rows=quanti_table_rows,
         quanti_details=quanti_details,
-        reference_table_rows=reference_table_rows
+        reference_table_rows=reference_table_rows,
+        HTML_BG_COLOR=theme.HTML_BG_COLOR,
+        HTML_TEXT_COLOR=theme.HTML_TEXT_COLOR,
+        HTML_HEADER_COLOR=theme.HTML_HEADER_COLOR,
+        HTML_CARD_BG=theme.HTML_CARD_BG,
+        HTML_TABLE_HEAD_BG=theme.HTML_TABLE_HEAD_BG,
+        HTML_TABLE_HEAD_TEXT=theme.HTML_TABLE_HEAD_TEXT,
+        HTML_TABLE_BORDER=theme.HTML_TABLE_BORDER
     )
     
     with open(output_path, 'w', encoding='utf-8') as f:
