@@ -15,3 +15,6 @@ test.db
 .coverage
 test_artifacts/
 
+*.html
+*.db
+.DS_Store

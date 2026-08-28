@@ -44,3 +44,4 @@
 ## Notas para o agente
 
 - O ambiente usa `uv`. Prefira `uv run python script.py` ou `uv run pytest`.
+- **UI/UX & Styling V2:** The hardcoded HTML report colors were completely refactored to use `theme.py`. A new pastel/executive palette (Teal, Gold, Coral, Muted Red, Wine) based on a design system image was applied to all plots, matrices, and UI elements. Changes are committed.
